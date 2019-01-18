@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="css/style.css"/>
+<script src="../jquery-2.2.1.min.js"></script>
+
+<script>
+
+function num_click(length){
+
+			//产生n个数字
+			var nums = [];
+			for (var i = 0; i <length; i++) { 				
+					nums[i] = i+1;
+			}
+
+			var col=3; //一行3个数字
+			var box_num=$('#box_num'); //#box_num组件
+			var str_array;	//用来存储随机排列的数字			
+			var ccount=0;	//计数
+			var tt=0;
+			var numTimeout=null;
+
+			
+ 			setPosition=function (){				
+				$("h3").hide();
+				str_array=shuffle();
+				tt=0;	
+				if (numTimeout)
+				{					
+					clearInterval(numTimeout);
+					numTimeout = null;
+				}
+				startTimer();
+			}();
+
+			function shuffle(){				
+				for(var j, x, i=0; i<length;i++){						
+					j = Math.floor(Math.random() * i);					
+					x = nums[i];
+					nums[i] = nums[j]; 
+					nums[j] = x;
+				} 
+				
+				//按排列后的数字产生按钮
+				box_num.empty().css({"opacity":"","height":""});
+				$.each( nums, function( key, value){				
+					
+					box_num.append( "<div class='div_num'>"+nums[key]+"</div>" );				
+					var nowCol = key % col,
+						nowRow = parseInt( key / col );					
+					$(".div_num").eq(key).css({
+						'position': 'absolute',
+						'left': nowCol * 180,
+						'top': nowRow * 120					
+					});		
+										
+
+				})
+
+
+				$(".div_num").click(function(){
+					ccount++;
+					
+					if($(this).html()!=ccount){						
+						box_num.animate({
+							opacity: 0,
+							height: 0
+						  }, 1000, function() {
+							$( this ).after( "<h3 style='width:200px;margin:0px auto;color:#ff0000;text-align:center'><img src='images/fail.png' width='218' height='181' border='0'>喔喔!失败了</h3>" );
+						  });
+						stopTimer(); 
+					}else{
+						$(this).css("background","#ccffcc");
+						
+						if ($(this).html()==(length))
+						{							
+							$(".div_num").off('click');
+							stopTimer(); 
+
+							box_num.prepend( "<div id='ans'><h3 style='width:200px;margin:0px auto;color:#000000;text-align:center'><img src='images/success.png' width='218' height='181' border='0'>Yes!成功!</h3></div>" );
+							$("#ans").css({'width':'250px','margin':'0px auto','zIndex':100,'position':'relative','opacity': 0}).animate({
+								top:50,
+								opacity: 1,
+								fontSize: "2em"
+							  }, 1500 );
+						}
+					}
+				})	
+
+			
+			}
+			function startTimer(){
+				numTimeout=setInterval(function(){
+					tt++;
+					$("#show_timer").html(tt);	
+				},1000);				
+			}
+			
+
+			function stopTimer(){				
+				clearInterval(numTimeout);
+				tt=0;
+				numTimeout = null;
+			}
+      
+	};
+	
+
+$(function(){
+$("button").click(function(){
+			num_click(9);
+})
+})
+
+
+
+</script>
+</head>
+<body>
+<div id="start_play">
+	<button>开始游戏</button>&nbsp;
+	所花时间：<span id="show_timer">0</span>秒
+</div>
+<div id="box_num"></div>
+
+</body>
+</html>
